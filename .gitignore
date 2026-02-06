@@ -1,0 +1,16 @@
+*.src.rpm
+*.rpm
+*.tar.gz
+*.spec
+.copr/*.src.rpm
+.copr/*.rpm
+.copr/*.tar.gz
+.copr/*.spec
+.copr/splitrandr-master/
+
+# Editor
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
