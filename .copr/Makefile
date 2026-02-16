@@ -62,6 +62,7 @@ srpm:
 	\
 	echo "=== Generating spec file ==="; \
 	( \
+	echo '%global debug_package %{nil}'; \
 	echo "%global commit $$COMMIT"; \
 	echo '%global shortcommit %(c=%{commit}; echo $${c:0:7})'; \
 	echo ''; \
