@@ -62,7 +62,6 @@ srpm:
 	\
 	echo "=== Generating spec file ==="; \
 	( \
-	echo '%global debug_package %{nil}'; \
 	echo "%global commit $$COMMIT"; \
 	echo '%global shortcommit %(c=%{commit}; echo $${c:0:7})'; \
 	echo ''; \
@@ -106,7 +105,7 @@ srpm:
 	echo '# Build fakexrandr library'; \
 	echo 'cd fakexrandr'; \
 	echo './configure || exit 1'; \
-	echo 'make %{?_smp_mflags} || exit 1'; \
+	echo 'make CFLAGS="%{optflags}" %{?_smp_mflags} || exit 1'; \
 	echo 'cd ..'; \
 	echo ''; \
 	echo '%install'; \
