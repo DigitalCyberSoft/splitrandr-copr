@@ -78,6 +78,8 @@ srpm:
 	echo 'BuildRequires:  gcc'; \
 	echo 'BuildRequires:  pkgconfig(xrandr)'; \
 	echo 'BuildRequires:  pkgconfig(x11)'; \
+	echo 'BuildRequires:  pkgconfig(xinerama)'; \
+	echo 'BuildRequires:  pkgconfig(xcb-randr)'; \
 	echo 'BuildRequires:  desktop-file-utils'; \
 	echo ''; \
 	echo 'Requires:       python3'; \
