@@ -1,0 +1,43 @@
+name: Check for Updates
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for new splitrandr commits
+        id: check
+        run: |
+          LATEST=$(curl -sf https://api.github.com/repos/DigitalCyberSoft/splitrandr/commits/main | sed -n 's/.*"sha": *"\([^"]*\)".*/\1/p' | head -1)
+          SAVED=""
+          if [ -f last_commit ]; then
+            SAVED=$(cat last_commit | tr -d '[:space:]')
+          fi
+          echo "Latest: $LATEST, Saved: ${SAVED:-none}"
+          if [ "$LATEST" != "$SAVED" ] && [ -n "$LATEST" ]; then
+            echo "changes=true" >> "$GITHUB_OUTPUT"
+            echo "commit=$LATEST" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update and push
+        if: steps.check.outputs.changes == 'true'
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          echo "${{ steps.check.outputs.commit }}" > last_commit
+          git add last_commit
+          git commit -m "Auto-update: new splitrandr commit ${{ steps.check.outputs.commit }}"
+          git push
+
+      - uses: gautamkrishnar/keepalive-workflow@v2
+        with:
+          time_elapsed: 45
