@@ -28,7 +28,7 @@ srpm:
 	echo "=== Getting commit info ==="; \
 	COMMIT=$$(cd splitrandr-master && git rev-parse HEAD); \
 	SHORTCOMMIT=$$(cd splitrandr-master && git rev-parse --short HEAD); \
-	VERSION=$$(cd splitrandr-master && python3 -c "import re; m=re.search(r\"__version__\s*=\s*'([^']+)'\", open('splitrandr/meta.py').read()); print(m.group(1))" 2>/dev/null || echo "0.1.0"); \
+	VERSION=$$(cd splitrandr-master && grep "__version__" splitrandr/meta.py | head -1 | cut -d"'" -f2); [ -n "$$VERSION" ] || VERSION="0.1.0"; \
 	echo "Commit: $$COMMIT"; \
 	echo "Short commit: $$SHORTCOMMIT"; \
 	echo "Version: $$VERSION"; \
