@@ -87,7 +87,7 @@ srpm:
 	echo 'Requires:       gtk3'; \
 	echo 'Requires:       xrandr'; \
 	echo 'Requires:       libXrandr'; \
-	echo 'Requires:       gdbus'; \
+	echo 'Requires:       /usr/bin/gdbus'; \
 	echo ''; \
 	echo 'Recommends:     libappindicator-gtk3'; \
 	echo ''; \
