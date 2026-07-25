@@ -18,26 +18,38 @@ jobs:
 
       - name: Check for new splitrandr commits
         id: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          LATEST=$(curl -sf https://api.github.com/repos/DigitalCyberSoft/splitrandr/commits/main | sed -n 's/.*"sha": *"\([^"]*\)".*/\1/p' | head -1)
+          LATEST=$(curl -sf -H "Authorization: Bearer ${GITHUB_TOKEN}" --connect-timeout 15 --max-time 60 --retry 3 --retry-all-errors https://api.github.com/repos/DigitalCyberSoft/splitrandr/commits/main | sed -n 's/.*"sha": *"\([^"]*\)".*/\1/p' | head -1)
+          # Hard error: silently treating an API failure as "no change"
+          # would skip the check while the run reports success.
+          if [ -z "$LATEST" ]; then
+            echo "ERROR: could not determine latest splitrandr commit from GitHub API" >&2
+            exit 1
+          fi
           SAVED=""
           if [ -f last_commit ]; then
             SAVED=$(cat last_commit | tr -d '[:space:]')
           fi
           echo "Latest: $LATEST, Saved: ${SAVED:-none}"
-          if [ "$LATEST" != "$SAVED" ] && [ -n "$LATEST" ]; then
+          if [ "$LATEST" != "$SAVED" ]; then
             echo "changes=true" >> "$GITHUB_OUTPUT"
             echo "commit=$LATEST" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Update and push
         if: steps.check.outputs.changes == 'true'
+        env:
+          # env indirection keeps the API-sourced value out of shell
+          # interpolation (script-injection hardening)
+          NEW_COMMIT: ${{ steps.check.outputs.commit }}
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
-          echo "${{ steps.check.outputs.commit }}" > last_commit
+          echo "${NEW_COMMIT}" > last_commit
           git add last_commit
-          git commit -m "Auto-update: new splitrandr commit ${{ steps.check.outputs.commit }}"
+          git commit -m "Auto-update: new splitrandr commit ${NEW_COMMIT}"
           git push
 
       - name: Verify CI configuration
